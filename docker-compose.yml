@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  nvme-rag:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: nvme-rag-cli
+    volumes:
+      # Mount data directory for persistence
+      - nvme-rag-data:/app/data
+      # Mount config directory
+      - nvme-rag-config:/home/nvmerag/.nvme-rag
+      # Mount documents directory (optional)
+      - ./documents:/app/documents:ro
+    environment:
+      - NVME_RAG_CONFIG_DIR=/home/nvmerag/.nvme-rag
+      - NVME_RAG_DATA_DIR=/app/data
+    ports:
+      - "8000:8000"  # For future web interface
+    stdin_open: true
+    tty: true
+    command: ["nvme-rag", "query", "chat"]
+    
+  # Optional: Ollama service (if not running externally)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: nvme-rag-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    
+  # Development service
+  nvme-rag-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: nvme-rag-dev
+    volumes:
+      - .:/app
+      - nvme-rag-data:/app/data
+      - nvme-rag-config:/home/nvmerag/.nvme-rag
+    environment:
+      - NVME_RAG_CONFIG_DIR=/home/nvmerag/.nvme-rag
+      - NVME_RAG_DATA_DIR=/app/data
+    stdin_open: true
+    tty: true
+    command: ["bash"]
+    profiles:
+      - dev
+
+volumes:
+  nvme-rag-data:
+    driver: local
+  nvme-rag-config:
+    driver: local
+  ollama-data:
+    driver: local
+
+networks:
+  default:
+    name: nvme-rag-network

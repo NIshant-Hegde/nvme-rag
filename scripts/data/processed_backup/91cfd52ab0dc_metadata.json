@@ -1,0 +1,11 @@
+{
+  "source_path": "data/raw/nvme-base-spec.pdf",
+  "document_type": "pdf",
+  "page_count": 458,
+  "processing_timestamp": "2025-06-02T18:24:01.097780",
+  "file_hash": "91cfd52ab0dcc44d105861952e825082195fa2329ac55481d2707bbb630d6e81",
+  "extraction_method": "pymupdf4llm",
+  "has_images": false,
+  "has_tables": true,
+  "language": "en"
+}

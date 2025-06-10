@@ -1,0 +1,49 @@
+# Include documentation
+include README.md
+include CLAUDE.md
+include CLI_DESIGN.md
+include CLI_IMPLEMENTATION_PLAN.md
+include CLI_PROGRESS_SUMMARY.md
+include LICENSE
+
+# Include requirements files
+include requirements.txt
+include requirements_phase2.txt
+
+# Include configuration files
+include pyproject.toml
+include setup.py
+
+# Include setup scripts
+include setup_nvme_rag.sh
+
+# Include package data
+recursive-include nvme_rag *.py
+recursive-include nvme_rag *.yaml
+recursive-include nvme_rag *.yml
+recursive-include nvme_rag *.json
+
+# Exclude unnecessary files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.pyd
+global-exclude __pycache__
+global-exclude .DS_Store
+global-exclude .git*
+global-exclude .pytest_cache
+global-exclude .mypy_cache
+global-exclude *.egg-info
+
+# Exclude data directories (these should be created at runtime)
+exclude data/
+exclude scripts/data/
+exclude tests/data/
+
+# Exclude logs
+exclude scripts/logs/
+exclude tests/logs/
+
+# Exclude temporary files
+exclude *.tmp
+exclude *.log
+exclude .env

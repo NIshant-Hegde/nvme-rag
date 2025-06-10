@@ -1,0 +1,9 @@
+{
+  "processing_time_seconds": 110.06372,
+  "total_chunks": 4779,
+  "total_characters": 1638551,
+  "average_chunk_size": 338.88847039129524,
+  "headers_found": 17,
+  "extraction_method": "pymupdf4llm",
+  "device_used": "mps"
+}

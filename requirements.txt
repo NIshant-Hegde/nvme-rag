@@ -1,6 +1,78 @@
-streamlit
-pymupdf
+# Core ML/AI Libraries
+torch
+torchvision
+transformers
 sentence-transformers
+accelerate
+
+# Document Processing
+pymupdf
+pymupdf4llm
+marker-pdf
+docling
+nougat-ocr
+pytesseract
+Pillow
+python-docx
+openpyxl
+
+# Vector Databases and Search
 faiss-cpu
-numpy
+chromadb
+qdrant-client
+elasticsearch
+
+# Text Processing and NLP
+spacy
+nltk
+beautifulsoup4
+markdown
+python-magic
+
+# LangChain Ecosystem
+langchain
+langchain-community
+langchain-experimental
+langchain-chroma
+
+# API and Web Framework
+fastapi
+uvicorn[standard]
+pydantic
+httpx
+
+# Data Processing
 pandas
+numpy
+scikit-learn
+
+# Configuration and Environment
+python-dotenv
+pyyaml
+configparser
+
+# Logging and Monitoring
+loguru
+rich
+tqdm
+
+# Development and Testing
+pytest
+pytest-asyncio
+black
+flake8
+mypy
+
+# CLI Framework and Utilities
+click>=8.0.0
+rich>=13.0.0
+pydantic>=2.0.0
+pyyaml>=6.0.0
+pathlib2
+requests
+aiofiles
+psutil
+
+# Optional: Local LLM Support
+ollama
+vllm
