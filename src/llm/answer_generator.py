@@ -39,6 +39,8 @@ class GeneratedAnswer:
     query_analysis: QueryAnalysis
     context_used: int
     generation_config: AnswerGenerationConfig
+    chunk_content_percentage: float = 0.0
+    llm_generated_percentage: float = 0.0
 
 
 class AnswerGenerator:
@@ -91,6 +93,11 @@ class AnswerGenerator:
                 query_analysis, context_chunks, answer
             )
             
+            # Calculate content percentages
+            chunk_percentage, llm_percentage = self._calculate_content_percentages(
+                answer, context_chunks
+            )
+            
             generated_answer = GeneratedAnswer(
                 answer=answer,
                 confidence=confidence,
@@ -98,7 +105,9 @@ class AnswerGenerator:
                 reasoning=reasoning,
                 query_analysis=query_analysis,
                 context_used=len(context_chunks),
-                generation_config=config
+                generation_config=config,
+                chunk_content_percentage=chunk_percentage,
+                llm_generated_percentage=llm_percentage
             )
             
             logger.info(f"Answer generated: {len(answer)} chars, confidence={confidence:.2f}")
@@ -114,7 +123,9 @@ class AnswerGenerator:
                 reasoning="Error occurred during generation",
                 query_analysis=query_analysis,
                 context_used=len(context_chunks),
-                generation_config=config
+                generation_config=config,
+                chunk_content_percentage=0.0,
+                llm_generated_percentage=100.0
             )
     
     def _build_context_string(self, chunks: List[ProcessedChunk], config: AnswerGenerationConfig) -> str:
@@ -327,6 +338,78 @@ Generate 3 specific, technical follow-up questions (one per line, no numbering):
         except Exception as e:
             logger.warning(f"Follow-up question generation failed: {e}")
             return []
+    
+    def _calculate_content_percentages(self, 
+                                      answer: str, 
+                                      context_chunks: List[ProcessedChunk]) -> tuple[float, float]:
+        """
+        Calculate what percentage of the answer comes from chunks vs LLM generation
+        
+        Args:
+            answer: Generated answer text
+            context_chunks: Retrieved context chunks used for generation
+            
+        Returns:
+            Tuple of (chunk_percentage, llm_percentage)
+        """
+        if not answer or not context_chunks:
+            return 0.0, 100.0
+        
+        import re
+        from difflib import SequenceMatcher
+        
+        # Combine all chunk content
+        chunk_text = " ".join([chunk.content for chunk in context_chunks])
+        
+        # Clean and normalize text for comparison
+        def clean_text(text):
+            # Remove extra whitespace and normalize
+            text = re.sub(r'\s+', ' ', text.strip().lower())
+            # Remove common punctuation that might differ
+            text = re.sub(r'[^\w\s]', '', text)
+            return text
+        
+        answer_clean = clean_text(answer)
+        chunk_text_clean = clean_text(chunk_text)
+        
+        if not answer_clean:
+            return 0.0, 100.0
+        
+        # Method 1: Find direct text overlaps using sliding window
+        answer_words = answer_clean.split()
+        chunk_words = chunk_text_clean.split()
+        
+        if not chunk_words:
+            return 0.0, 100.0
+        
+        matched_words = set()
+        window_sizes = [8, 6, 4, 3, 2]  # Different phrase lengths to check
+        
+        for window_size in window_sizes:
+            for i in range(len(answer_words) - window_size + 1):
+                answer_phrase = ' '.join(answer_words[i:i + window_size])
+                
+                # Check if this phrase exists in chunk text
+                if answer_phrase in chunk_text_clean:
+                    for j in range(i, i + window_size):
+                        matched_words.add(j)
+        
+        # Method 2: Use sequence matching for additional coverage
+        matcher = SequenceMatcher(None, answer_clean, chunk_text_clean)
+        matching_blocks = matcher.get_matching_blocks()
+        
+        # Count characters that match in substantial blocks (min 20 chars)
+        char_matches = sum(block.size for block in matching_blocks if block.size >= 20)
+        sequence_match_ratio = char_matches / len(answer_clean) if answer_clean else 0
+        
+        # Combine both methods
+        word_match_ratio = len(matched_words) / len(answer_words) if answer_words else 0
+        
+        # Weight the methods (word matching is more precise, sequence matching catches missed cases)
+        chunk_percentage = min(100.0, word_match_ratio * 70 + sequence_match_ratio * 30)
+        llm_percentage = max(0.0, 100.0 - chunk_percentage)
+        
+        return chunk_percentage, llm_percentage
     
     def update_config(self, **kwargs):
         """Update answer generation configuration"""

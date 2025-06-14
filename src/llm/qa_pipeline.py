@@ -303,7 +303,9 @@ class QAPipeline:
             reasoning="Error occurred during processing",
             query_analysis=error_analysis,
             context_used=0,
-            generation_config=self.default_answer_config
+            generation_config=self.default_answer_config,
+            chunk_content_percentage=0.0,
+            llm_generated_percentage=100.0
         )
         
         return QAResult(
@@ -349,6 +351,10 @@ class QAPipeline:
             "query": qa_result.query,
             "answer": qa_result.generated_answer.answer,
             "confidence": qa_result.generated_answer.confidence,
+            "content_source_percentages": {
+                "chunk_content_percentage": qa_result.generated_answer.chunk_content_percentage,
+                "llm_generated_percentage": qa_result.generated_answer.llm_generated_percentage
+            },
             "sources": qa_result.generated_answer.sources,
             "follow_up_questions": qa_result.follow_up_questions,
             "query_analysis": {

@@ -1,4 +1,4 @@
-# Core ML/AI Libraries
+# Core ML / AI Libraries
 torch
 torchvision
 transformers
@@ -8,7 +8,7 @@ accelerate
 # Document Processing
 pymupdf
 pymupdf4llm
-marker-pdf
+marker-pdf  # Optional but recommended
 docling
 nougat-ocr
 pytesseract
@@ -38,7 +38,7 @@ langchain-chroma
 # API and Web Framework
 fastapi
 uvicorn[standard]
-pydantic
+pydantic>=2.0.0
 httpx
 
 # Data Processing
@@ -48,30 +48,29 @@ scikit-learn
 
 # Configuration and Environment
 python-dotenv
-pyyaml
+pyyaml>=6.0.0
 configparser
 
 # Logging and Monitoring
 loguru
-rich
+rich>=13.0.0
 tqdm
 
 # Development and Testing
 pytest
 pytest-asyncio
+pytest-cov
 black
 flake8
 mypy
 
 # CLI Framework and Utilities
 click>=8.0.0
-rich>=13.0.0
-pydantic>=2.0.0
-pyyaml>=6.0.0
-pathlib2
 requests
 aiofiles
 psutil
+pathlib2
+dataclasses
 
 # Optional: Local LLM Support
 ollama

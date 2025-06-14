@@ -73,7 +73,7 @@ class NVMeQADemo:
         )
         
         # Initialize pipeline
-        print("Initializing NVMe Base Spec QA System...")
+        print("\nInitializing NVMe Base Spec QA System...")
         self.rag_pipeline = RAGPipelineIntegration(
             vector_store_path=self.vector_store_path,
             embedding_config=self.embedding_config,
@@ -100,18 +100,18 @@ class NVMeQADemo:
             components = status.get('components', {})
             for component, info in components.items():
                 comp_status = info.get('status', 'unknown')
-                print(f"  {component}: {comp_status}")
+                print(f"{component}: {comp_status}")
             
             # Vector store info
             vector_info = components.get('vector_store', {})
             chunk_count = vector_info.get('total_chunks', 0)
             if chunk_count > 0:
-                print(f"  Indexed chunks: {chunk_count}")
+                print(f"Indexed chunks: {chunk_count}")
             else:
-                print("  No indexed documents found. Please run document processing first.")
+                print("No indexed documents found. Please run document processing first.")
             
         except Exception as e:
-            print(f"  System status check failed: {e}")
+            print(f"System status check failed: {e}")
     
     def run_interactive_demo(self):
         """Run interactive question-answering session"""
@@ -120,11 +120,11 @@ class NVMeQADemo:
         
         while True:
             try:
-                print("\n" + "-"*60)
+                print("\n" + "-"*150)
                 print("Ask questions about NVMe base specification!")
-                print("\nOR")
+                print("\n                       OR")
                 print("\nType 'config' to see current configuration, 'status' to check system status, 'demo' for sample questions, 'quit' to exit, 'help' for commands")
-                print("-"*60)
+                print("-"*150)
                
                 # Get user input
                 user_input = input("\nYour question or command: ").strip()
@@ -149,7 +149,7 @@ class NVMeQADemo:
                     continue
                 
                 # Process question
-                print("\nProcessing your question...")
+                print("\nProcessing...")
                 qa_result = self.rag_pipeline.ask_question(
                     question=user_input,
                     session_id=session_id
@@ -170,7 +170,7 @@ class NVMeQADemo:
                 print("\n\nDemo interrupted by user")
                 break
             except Exception as e:
-                print(f"\n Error processing question: {e}")
+                print(f"\nError processing question: {e}")
                 logger.error(f"Demo error: {e}", exc_info=True)
         
         print("\nThanks for using the NVMe QA System!")
@@ -190,12 +190,16 @@ class NVMeQADemo:
         
         # Show confidence and sources
         confidence = qa_result.generated_answer.confidence
-        print(f"\n  Confidence: {confidence:.1%}")
+        print(f"\nConfidence: {confidence:.1%}")
         
+        # Show content source percentages
+        chunk_percentage = qa_result.generated_answer.chunk_content_percentage
+        llm_percentage = qa_result.generated_answer.llm_generated_percentage
+        #print(f"  Content Sources: {chunk_percentage:.1f}% from retrieved chunks, {llm_percentage:.1f}% LLM generated")
         
         # printing what sources were used to answer the question
         if qa_result.generated_answer.sources:
-            print(f"  Sources: {len(qa_result.generated_answer.sources)} sections")
+            print(f"Sources: {len(qa_result.generated_answer.sources)} sections")
             for i, source in enumerate(qa_result.generated_answer.sources[:3], 1):
                 section = source.get('section', 'Unknown')
                 page = source.get('page', 'N/A')
@@ -203,15 +207,15 @@ class NVMeQADemo:
         
         # Show query analysis
         analysis = qa_result.query_analysis
-        print(f"\n  Query Analysis:")
-        print(f"  Type: {analysis.query_type.value}")
-        print(f"  Intent: {analysis.intent}")
+        print(f"\nQuery Analysis:")
+        print(f"Type: {analysis.query_type.value}")
+        print(f"Intent: {analysis.intent}")
         if analysis.technical_terms:
-            print(f"  Technical terms: {', '.join(analysis.technical_terms[:5])}")
+            print(f"Technical terms: {', '.join(analysis.technical_terms[:5])}")
         
         # Show processing stats
-        print(f"\n  Processing: {qa_result.processing_time_seconds:.2f}s")
-        print(f"  Context chunks: {qa_result.generated_answer.context_used}")
+        print(f"\nProcessing: {qa_result.processing_time_seconds:.2f}s")
+        print(f"Context chunks: {qa_result.generated_answer.context_used}")
         
         # disabling this for now
         '''
@@ -231,7 +235,7 @@ class NVMeQADemo:
         
         while True:
             try:
-                choice = input("\n  Ask a follow-up? (enter number, 'n' for no, or type your own): ").strip()
+                choice = input("\nAsk a follow-up? (enter number, 'n' for no, or type your own): ").strip()
                 
                 if choice.lower() in ['n', 'no', '']:
                     break
@@ -241,7 +245,7 @@ class NVMeQADemo:
                     idx = int(choice) - 1
                     if 0 <= idx < len(qa_result.follow_up_questions):
                         follow_up_question = qa_result.follow_up_questions[idx]
-                        print(f"\n  Following up: {follow_up_question}")
+                        print(f"\nFollowing up: {follow_up_question}")
                         
                         # Process follow-up
                         follow_up_result = self.rag_pipeline.ask_follow_up(
@@ -252,11 +256,11 @@ class NVMeQADemo:
                         self._display_qa_result(follow_up_result)
                         break
                     else:
-                        print("  Invalid number. Please try again.")
+                        print("Invalid number. Please try again.")
                         continue
                 else:
                     # Custom follow-up question
-                    print(f"\n  Following up: {choice}")
+                    print(f"\nFollowing up: {choice}")
                     follow_up_result = self.rag_pipeline.ask_follow_up(
                         follow_up_question=choice,
                         previous_result=qa_result
@@ -266,9 +270,9 @@ class NVMeQADemo:
                     break
                     
             except ValueError:
-                print("  Invalid input. Please try again.")
+                print("Invalid input. Please try again.")
             except Exception as e:
-                print(f"  Error with follow-up: {e}")
+                print(f"Error with follow-up: {e}")
                 break
     
     def _run_sample_questions(self):
@@ -285,9 +289,9 @@ class NVMeQADemo:
         
         for i, question in enumerate(sample_questions, 1):
             print(f"\n{'='*60}")
-            print(f"  Sample Question {i}/{len(sample_questions)}")
+            print(f"Sample Question {i}/{len(sample_questions)}")
             print(f"{'='*60}")
-            print(f"  {question}")
+            print(f"{question}")
             
             try:
                 qa_result = self.rag_pipeline.ask_question(question)
@@ -295,51 +299,51 @@ class NVMeQADemo:
                 
                 # Pause between questions
                 if i < len(sample_questions):
-                    input("\n   Press Enter to continue to next question...")
+                    input("\nPress Enter to continue to next question...")
                     
             except Exception as e:
-                print(f"  Error with sample question: {e}")
+                print(f"Error with sample question: {e}")
         
-        print("\n  Sample demonstration completed!")
+        print("\nSample demonstration completed!")
     
     def _show_help(self):
         """Show help information"""
-        print("\n  Available Commands:")
-        print("  help     - Show this help message")
-        print("  demo     - Run sample questions")
-        print("  config   - Show current configuration")
-        print("  status   - Check system status")
-        print("  quit     - Exit the demo")
-        print("\n  Tips:")
-        print("  - Ask specific technical questions about NVMe")
-        print("  - Use follow-up questions to dive deeper")
-        print("  - The system maintains conversation context")
+        print("\nAvailable Commands:")
+        print("help     - Show this help message")
+        print("demo     - Run sample questions")
+        print("config   - Show current configuration")
+        print("status   - Check system status")
+        print("quit     - Exit the demo")
+        print("\nTips:")
+        print(" - Ask specific technical questions about NVMe")
+        print(" - Use follow-up questions to dive deeper")
+        print(" - The system maintains conversation context")
     
     def _show_config(self):
         """Show current configuration"""
-        print("\n  Current Configuration:")
-        print(f"  Vector Store: {self.vector_store_path}")
-        print(f"  LLM Model: {self.ollama_config.model}")
-        print(f"  Retrieval Strategy: {self.retrieval_config.strategy.value}")
-        print(f"  Answer Style: {self.answer_config.style.value}")
-        print(f"  Max Context: {self.retrieval_config.max_context_length}")
-        print(f"  Top-K Results: {self.retrieval_config.top_k}")
+        print("\nCurrent Configuration:")
+        print(f"Vector Store: {self.vector_store_path}")
+        print(f"LLM Model: {self.ollama_config.model}")
+        print(f"Retrieval Strategy: {self.retrieval_config.strategy.value}")
+        print(f"Answer Style: {self.answer_config.style.value}")
+        print(f"Max Context: {self.retrieval_config.max_context_length}")
+        print(f"Top-K Results: {self.retrieval_config.top_k}")
     
     def _show_session_summary(self, session_id: str):
         """Show session summary"""
         try:
             summary = self.rag_pipeline.get_conversation_summary(session_id)
             
-            print("\n  Session Summary:")
-            print(f"  Questions Asked: {summary.get('total_exchanges', 0)}")
-            print(f"  Session Duration: {summary.get('session_duration_minutes', 0):.1f} minutes")
+            print("\nSession Summary:")
+            print(f"Questions Asked: {summary.get('total_exchanges', 0)}")
+            print(f"Session Duration: {summary.get('session_duration_minutes', 0):.1f} minutes")
             
             topics = summary.get('topics_discussed', [])
             if topics:
-                print(f"  Topics Discussed: {', '.join(topics)}")
+                print(f"Topics Discussed: {', '.join(topics)}")
                 
         except Exception as e:
-            print(f"  Could not generate session summary: {e}")
+            print(f"Could not generate session summary: {e}")
     
     def export_demo_results(self, qa_result, filename: str = None):
         """Export QA result to JSON file"""
@@ -352,10 +356,10 @@ class NVMeQADemo:
             with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(exported_data, f, indent=2, ensure_ascii=False)
             
-            print(f"  Results exported to: {filename}")
+            print(f"Results exported to: {filename}")
             
         except Exception as e:
-            print(f"  Export failed: {e}")
+            print(f"Export failed: {e}")
 
 
 def main():
@@ -368,17 +372,17 @@ def main():
         demo.run_interactive_demo()
         
     except KeyboardInterrupt:
-        print("\n\n  Demo terminated by user")
+        print("\n\nDemo terminated by user")
     except Exception as e:
-        print(f"\n  Demo failed: {e}")
+        print(f"\nDemo failed: {e}")
         logger.error(f"Demo failed: {e}", exc_info=True)
     finally:
-        print("\n  Cleaning up...")
+        print("\nCleaning up...")
         try:
             if 'demo' in locals():
                 demo.rag_pipeline.cleanup()
         except Exception as e:
-            print(f"  Cleanup warning: {e}")
+            print(f"Cleanup warning: {e}")
 
 
 if __name__ == "__main__":
