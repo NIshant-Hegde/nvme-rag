@@ -2,6 +2,8 @@
 
 A professional Retrieval-Augmented Generation (RAG) system specifically designed for the NVMe Base Specification documentation. This system enables intelligent question-answering, context retrieval, and answer generation based on NVMe technical specifications.
 
+![Q2.png](https://github.com/NIshant-Hegde/nvme-rag/blob/main/Q2.png)
+
 ## Features
 
 - **Intelligent Document Processing**: Advanced PDF processing with semantic chunking
